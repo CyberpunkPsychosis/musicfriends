@@ -1,0 +1,14 @@
+spring:
+  profiles:
+    active: dev
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 100MB
+mybatis:
+  mapper-locations: classpath:mybatis/mappers/*.xml
+  type-aliases-package: com.music.friends.app.pojo
+  configuration:
+    map-underscore-to-camel-case: true
+server:
+  port: 80
