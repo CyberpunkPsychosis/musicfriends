@@ -12,3 +12,9 @@ git checkout <旧commit> -- .   # 取回旧版本的文件
 ## 文档
 
 - [AI 协作音乐制作工作流](docs/workflow.md) —— 角色分工、模块化原则、AI↔FL 交接方式、工具链
+- [音乐生成大模型 API 对比](docs/music-api-comparison.md) —— 各家 API 现状、选型建议、来源
+
+## 代码
+
+- [`ai-music/`](ai-music/) —— 大模型生成「口子」：统一调度各家 API，key 走环境变量。
+  `python generate.py --list` 看就绪状态，填 `.env` 即可启用。

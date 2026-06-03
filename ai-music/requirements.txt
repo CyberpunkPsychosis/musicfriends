@@ -1,0 +1,5 @@
+# 按需安装，用哪家装哪家
+replicate          # Replicate（MusicGen）
+requests           # Stable Audio / Suno
+elevenlabs         # ElevenLabs Music
+python-dotenv      # 可选：自动加载 .env（没装也有手动解析兜底）

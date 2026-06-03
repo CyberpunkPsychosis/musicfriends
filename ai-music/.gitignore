@@ -1,0 +1,7 @@
+# 绝不提交真实 key 和生成产物
+.env
+output/
+*.wav
+*.mp3
+__pycache__/
+*.pyc
