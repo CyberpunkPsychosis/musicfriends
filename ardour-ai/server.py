@@ -113,5 +113,20 @@ def import_audio(track: int, file_path: str) -> str:
     return _lua("import_audio", track=track, file_path=file_path)
 
 
+@mcp.tool()
+def save_arrangement(bpm: float, tracks: list[dict], out_dir: str,
+                     render: bool = False) -> str:
+    """把我（对话中的 Claude）写出的编排落地成 .mid 文件（不需要 Ardour）。
+
+    tracks 每项: {"name":"Melody", "channel":2, "notes":[
+                   {"pitch":60,"start":0.0,"length":1.0,"velocity":100}, ...]}
+    鼓轨 channel=9。render=True 时另出 full.wav 试听。
+    用于「文件流」：产出 .mid 让你拖进 FL / Ardour。
+    """
+    from ardour_ai.arrangement import materialize
+    paths = materialize({"bpm": bpm, "tracks": tracks}, out_dir, render=render)
+    return "✅ 已落地：" + ", ".join(p.name for p in paths) + f"（{out_dir}/）"
+
+
 if __name__ == "__main__":
     mcp.run()

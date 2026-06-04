@@ -77,11 +77,14 @@ python make_demo.py --style future_bass --melody --seed 7 --render
 - `ardour_ai/render.py` —— MIDI → WAV 试听合成，让「生成 → 听 → 迭代」闭环。
   `python -m ardour_ai.render any.mid` 可渲染任意 .mid。注：试听音质，成品音色仍在
   FL/Ardour 用你的音色做。
-- `ardour_ai/llm_compose.py` —— **LLM 符号作曲口子**：让 AI 直接出旋律/和弦的 MIDI。
-  key 走 `ANTHROPIC_API_KEY`（没 key 时退回本地算法作曲）。JSON→轨道 的解析已单测。
+- `ardour_ai/arrangement.py` —— 把**音符 JSON 落地**成 MIDI/试听（无需 key）。
+  对话中的 Claude（我）直接产出音符 → 这里变成 .mid / .wav / 进 Ardour。
+  **不需要 Anthropic API**：驱动 MCP 的就是 Claude，不必让 server 反过来调 Claude。
+  对应 MCP 工具 `save_arrangement`。JSON→轨道 的解析已单测。
 
-> 两条「AI 生成」通路：**符号**（本地算法 / LLM 口子 → MIDI → 试听 / 进 Ardour `write_notes`）
-> 与 **音频**（`../ai-music/` 大模型 → stem → 进 Ardour `import_audio`）。
+> 两条「AI 生成」通路：
+> **符号**（我在对话里产出音符 → `arrangement`/`write_notes` → MIDI / 进 Ardour）——无需 key；
+> **音频**（`../ai-music/` 大模型如 MusicGen → stem → 进 Ardour `import_audio`）——需各家 key。
 
 > 同一个 `Note` 模型既能 `write_smf` 成文件，也能经 `write_notes` MCP 工具进 Ardour。
 > 这层是未来离线 `.ardour` 工程生成器要引用的素材基础。

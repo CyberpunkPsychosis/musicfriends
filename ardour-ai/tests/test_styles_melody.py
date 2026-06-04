@@ -1,9 +1,9 @@
-"""风格库、旋律生成、LLM JSON 解析的单测（均不依赖 Ardour / API key）。"""
+"""风格库、旋律生成、编排 JSON 落地的单测（均不依赖 Ardour / API key）。"""
 import pytest
 
 from ardour_ai import compose
 from ardour_ai.commands import Note
-from ardour_ai.llm_compose import arrangement_from_json, compose_with_llm, MissingAPIKey
+from ardour_ai.arrangement import arrangement_from_json, materialize
 
 
 # ---- 风格库 ----
@@ -66,7 +66,7 @@ def test_arrangement_with_melody_adds_track():
     assert len(mel) == len(base) + 1
 
 
-# ---- LLM JSON 解析（口子，不需要 key）----
+# ---- 编排 JSON 落地（我在对话里产出音符 → MIDI；不需要 key）----
 
 def test_arrangement_from_json_ok():
     data = {"bpm": 128, "tracks": [
@@ -93,7 +93,11 @@ def test_arrangement_from_json_empty_raises():
         arrangement_from_json({"bpm": 120, "tracks": []})
 
 
-def test_compose_with_llm_without_key(monkeypatch):
-    monkeypatch.delenv("ANTHROPIC_API_KEY", raising=False)
-    with pytest.raises(MissingAPIKey):
-        compose_with_llm("test")
+def test_materialize_writes_midi(tmp_path):
+    data = {"bpm": 140, "tracks": [
+        {"name": "Lead", "channel": 2,
+         "notes": [{"pitch": 60, "start": 0.0, "length": 1.0}]}]}
+    paths = materialize(data, tmp_path)
+    names = {p.name for p in paths}
+    assert "lead.mid" in names and "full.mid" in names
+    assert all(p.exists() for p in paths)
