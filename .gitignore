@@ -1,0 +1,11 @@
+# Python
+.venv*/
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# 生成产物 / 本地密钥
+output/
+*.wav
+*.mp3
+.env

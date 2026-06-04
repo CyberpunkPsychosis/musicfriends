@@ -19,3 +19,5 @@ git checkout <旧commit> -- .   # 取回旧版本的文件
 
 - [`ai-music/`](ai-music/) —— 大模型生成「口子」：统一调度各家 API，key 走环境变量。
   `python generate.py --list` 看就绪状态，填 `.env` 即可启用。
+- [`ardour-ai/`](ardour-ai/) —— AI 驱动 Ardour 的 MCP server（阶段 1）：混音/走带走 OSC，
+  编曲走 Lua 命令队列。不依赖 Ardour 的逻辑已 `pytest` 测通（11 passed）。

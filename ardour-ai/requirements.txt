@@ -1,0 +1,3 @@
+mcp[cli]      # MCP server SDK (FastMCP)
+python-osc    # Ardour OSC 控制
+pytest        # 测试（开发用）
