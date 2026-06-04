@@ -16,7 +16,8 @@ from __future__ import annotations
 import argparse
 import sys
 
-from providers import get_provider, all_providers, MusicSpec, MissingAPIKey
+from providers import (get_provider, all_providers, preferred_provider,
+                       MusicSpec, MissingAPIKey)
 
 
 def cmd_list() -> None:
@@ -32,6 +33,8 @@ def cmd_list() -> None:
 def main() -> int:
     ap = argparse.ArgumentParser(description="AI 音乐生成统一入口")
     ap.add_argument("--list", action="store_true", help="列出 provider 及就绪状态")
+    ap.add_argument("--auto", action="store_true",
+                    help="自动选优先级最高且已配置 key 的专业模型（出声音优先专业模型）")
     ap.add_argument("--provider", help="replicate / stable_audio / elevenlabs / suno")
     ap.add_argument("--prompt", help="文本描述")
     ap.add_argument("--duration", type=int, default=30, help="时长(秒)")
@@ -44,13 +47,23 @@ def main() -> int:
     ap.add_argument("--out", default="output", help="输出目录")
     args = ap.parse_args()
 
-    if args.list or not args.provider:
+    if args.list or (not args.provider and not args.auto):
         cmd_list()
         return 0
 
     if not args.prompt:
         print("缺少 --prompt", file=sys.stderr)
         return 2
+
+    if args.auto:
+        provider = preferred_provider()
+        if provider is None:
+            print("⛔ 没有已配置 key 的专业模型；可先填 key，或走符号路出 MIDI"
+                  "（无需 key）。", file=sys.stderr)
+            return 1
+        print(f"🎯 自动路由 → {provider.name}（{provider.blurb}）")
+    else:
+        provider = get_provider(args.provider)
 
     spec = MusicSpec(
         prompt=args.prompt,
@@ -63,7 +76,6 @@ def main() -> int:
         seed=args.seed,
         output_dir=args.out,
     )
-    provider = get_provider(args.provider)
     try:
         result = provider.generate(spec)
     except MissingAPIKey as e:

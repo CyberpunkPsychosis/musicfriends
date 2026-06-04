@@ -16,6 +16,10 @@ python generate.py --list      # 看哪些 provider 就绪 / 哪些待填 key
 cp .env.example .env           # 填入任意一家的 key
 pip install -r requirements.txt
 
+# 自动路由：选优先级最高且已配置 key 的专业模型（出声音优先专业模型）
+python generate.py --auto --prompt "140 BPM melodic dubstep, dark to euphoric"
+
+# 或指定一家：
 python generate.py --provider replicate \
     --prompt "140 BPM melodic dubstep, dark intro to euphoric drop" \
     --bpm 140 --duration 30
@@ -23,6 +27,9 @@ python generate.py --provider replicate \
 # 以你自己的旋律为基础生成编曲（旋律你主导）：
 python generate.py --provider replicate --prompt "..." --melody my_lead.wav
 ```
+
+> **路由原则**：出"声音"优先调专业模型（`--auto` 按 `PRIORITY` 选已配置的，
+> MusicGen 居首）；要**可编辑 MIDI** 仍走符号路（`../ardour-ai/`，无需 key）。
 
 ## 各家现状（2026 年中）
 
