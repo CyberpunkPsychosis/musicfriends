@@ -5,3 +5,6 @@ pytest        # 测试（开发用）
 # 试听渲染（可选；不渲染就不用装）
 numpy         # MIDI → WAV 合成
 mido          # 渲染任意 .mid 文件 / 测试回读
+
+# LLM 符号作曲口子（可选；要用 AI 出旋律/和弦才装）
+anthropic     # 需 ANTHROPIC_API_KEY

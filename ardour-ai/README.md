@@ -64,17 +64,24 @@ python server.py               # 启动 MCP server (stdio)
 不依赖 Ardour 也不依赖任何 key：把高层描述变成真实 `.mid`，FL / Ardour 都能拖入。
 
 ```bash
-python make_demo.py --bpm 140 --bars 8 --out demo_midi --render
-# 产出 drums/chords/bass/buildup（按轨分文件，模块化）+ full（合并）
-# --render 还会合成 full.wav 试听
+python make_demo.py --style house --bars 8 --render
+python make_demo.py --style future_bass --melody --seed 7 --render
+# 风格: melodic(默认) / house / future_bass / dubstep
+# 产出按轨分文件(模块化) + buildup + full；--render 出 full.wav 试听
 ```
 
 - `ardour_ai/midi.py` —— 无依赖 SMF 写入器（Note → .mid），用 mido 回读验证
-- `ardour_ai/compose.py` —— EDM 助手：和弦走向、four-on-floor 鼓、bass、buildup
-  （命中你的节奏/和声痛点；**旋律默认不生成，留给你**）
-- `ardour_ai/render.py` —— MIDI → WAV 试听合成（鼓/乐音合成 + ADSR），让
-  「生成 → 听 → 迭代」闭环。`python -m ardour_ai.render any.mid` 可渲染任意 .mid。
-  注：试听音质，成品音色仍在 FL/Ardour 用你的音色做。
+- `ardour_ai/compose.py` —— EDM 助手 + **风格库**（house/future_bass/dubstep/melodic）：
+  风格各带 BPM/鼓型/bass 型/走向；`build_arrangement()` 统一组装。
+  **旋律默认不生成，留给你**；`--melody` 出一版「引子」（音阶加权游走，seed 可复现）。
+- `ardour_ai/render.py` —— MIDI → WAV 试听合成，让「生成 → 听 → 迭代」闭环。
+  `python -m ardour_ai.render any.mid` 可渲染任意 .mid。注：试听音质，成品音色仍在
+  FL/Ardour 用你的音色做。
+- `ardour_ai/llm_compose.py` —— **LLM 符号作曲口子**：让 AI 直接出旋律/和弦的 MIDI。
+  key 走 `ANTHROPIC_API_KEY`（没 key 时退回本地算法作曲）。JSON→轨道 的解析已单测。
+
+> 两条「AI 生成」通路：**符号**（本地算法 / LLM 口子 → MIDI → 试听 / 进 Ardour `write_notes`）
+> 与 **音频**（`../ai-music/` 大模型 → stem → 进 Ardour `import_audio`）。
 
 > 同一个 `Note` 模型既能 `write_smf` 成文件，也能经 `write_notes` MCP 工具进 Ardour。
 > 这层是未来离线 `.ardour` 工程生成器要引用的素材基础。

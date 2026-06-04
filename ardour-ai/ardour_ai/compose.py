@@ -101,3 +101,146 @@ def drum_buildup(bars: int = 1, beats_per_bar: int = 4, name: str = "Buildup") -
 DEFAULT_PROGRESSION: list[tuple[str, str]] = [
     ("F", "min7"), ("Db", "maj7"), ("Ab", "maj7"), ("Eb", "maj7"),
 ]
+
+
+# ============ 风格库 ============
+# 每种风格定义：BPM、和弦走向、鼓型、bass 型。鼓/bass 型用下面的具名生成器。
+
+def _drums_halftime(bars: int, beats_per_bar: int = 4, name: str = "Drums") -> MidiTrack:
+    """半拍速鼓（future bass / dubstep 感）：底鼓在拍1，军鼓在拍3，16 分闭镲。"""
+    notes: list[Note] = []
+
+    def hit(p: int, s: float, v: int, ln: float = 0.25) -> None:
+        notes.append(Note(pitch=p, start=s, length=ln, velocity=v))
+
+    for bar in range(bars):
+        b0 = bar * beats_per_bar
+        hit(KICK, b0 + 0, 115)                       # 拍1 底鼓
+        hit(SNARE, b0 + 2, 105)                      # 拍3 军鼓（半拍速）
+        for i in range(beats_per_bar * 4):           # 16 分闭镲
+            hit(CHH, b0 + i * 0.25, 50 if i % 2 else 70)
+        hit(OHH, b0 + 2.5, 65)
+    return MidiTrack(name=name, notes=notes, channel=9)
+
+
+def _bass_offbeat(progression, octave=2, bars=8, beats_per_bar=4,
+                  velocity=100, name="Bass") -> MidiTrack:
+    """house 反拍 bass：每拍的「与」(+0.5) 上弹根音，弹跳感。"""
+    notes: list[Note] = []
+    for bar in range(bars):
+        root, _ = progression[bar % len(progression)]
+        pitch = note_number(root, octave)
+        for beat in range(beats_per_bar):
+            notes.append(Note(pitch=pitch, start=bar * beats_per_bar + beat + 0.5,
+                              length=0.45, velocity=velocity))
+    return MidiTrack(name=name, notes=notes, channel=1)
+
+
+def _bass_halftime(progression, octave=2, bars=8, beats_per_bar=4,
+                   velocity=110, name="Bass") -> MidiTrack:
+    """半拍速 bass：每 2 拍一个长根音（dubstep/future bass 感）。"""
+    notes: list[Note] = []
+    for bar in range(bars):
+        root, _ = progression[bar % len(progression)]
+        pitch = note_number(root, octave)
+        for half in range(0, beats_per_bar, 2):
+            notes.append(Note(pitch=pitch, start=float(bar * beats_per_bar + half),
+                              length=1.9, velocity=velocity))
+    return MidiTrack(name=name, notes=notes, channel=1)
+
+
+# style -> 配置。drums/bass 为 (生成器, 额外kwargs)
+STYLES: dict[str, dict] = {
+    "house": {
+        "bpm": 124, "progression": DEFAULT_PROGRESSION,
+        "drums": (drums_four_on_floor, {}),
+        "bass": (_bass_offbeat, {}),
+        "chord_octave": 4,
+    },
+    "future_bass": {
+        "bpm": 150, "progression": [("F", "min7"), ("Ab", "maj7"),
+                                    ("Eb", "maj7"), ("Db", "maj7")],
+        "drums": (_drums_halftime, {}),
+        "bass": (_bass_halftime, {}),
+        "chord_octave": 4,
+    },
+    "dubstep": {
+        "bpm": 140, "progression": [("F", "min"), ("C", "min"),
+                                    ("Db", "maj"), ("Eb", "maj")],
+        "drums": (_drums_halftime, {}),
+        "bass": (_bass_halftime, {"octave": 1}),
+        "chord_octave": 3,
+    },
+    "melodic": {  # 默认（之前的行为）
+        "bpm": 140, "progression": DEFAULT_PROGRESSION,
+        "drums": (drums_four_on_floor, {}),
+        "bass": (bass_track, {}),
+        "chord_octave": 4,
+    },
+}
+
+
+# ============ 旋律（可选档：「给我一版引子」）============
+
+# 自然小调音阶（相对根音的半音）
+_MINOR_SCALE = [0, 2, 3, 5, 7, 8, 10]
+
+
+def minor_scale_pitches(root: str, octave: int) -> list[int]:
+    base = note_number(root, octave)
+    return [base + s for s in _MINOR_SCALE]
+
+
+def melody_track(progression, bars: int = 8, beats_per_bar: int = 4, octave: int = 5,
+                 seed: int | None = None, velocity: int = 95,
+                 name: str = "Melody (AI 引子)") -> MidiTrack:
+    """在小调音阶上做加权随机游走生成主旋律引子。
+
+    —— 这是「引子」，旋律最终是你的地盘（见 workflow 角色分工）。
+    强拍倾向落在当前和弦音上；偶尔留白。seed 固定则结果可复现。
+    """
+    import random
+    rng = random.Random(seed)
+    notes: list[Note] = []
+    for bar in range(bars):
+        root, qual = progression[bar % len(progression)]
+        scale = minor_scale_pitches(root, octave)
+        chord = [note_number(root, octave) + iv for iv in _TRIAD.get(qual, _TRIAD["min"])]
+        pos = 0.0
+        while pos < beats_per_bar - 1e-6:
+            dur = rng.choice([0.5, 0.5, 1.0, 1.0, 1.5])
+            dur = min(dur, beats_per_bar - pos)
+            on_strong = abs(pos - round(pos)) < 1e-6
+            if rng.random() < 0.12:                      # 留白
+                pos += dur
+                continue
+            if on_strong and rng.random() < 0.6:
+                pitch = rng.choice(chord)                # 强拍落和弦音
+            else:
+                pitch = rng.choice(scale)
+            notes.append(Note(pitch=pitch, start=bar * beats_per_bar + pos,
+                              length=dur * 0.95, velocity=velocity))
+            pos += dur
+    return MidiTrack(name=name, notes=notes, channel=2)
+
+
+# ============ 统一编排 ============
+
+def build_arrangement(style: str = "melodic", bars: int = 8, with_melody: bool = False,
+                      seed: int | None = None) -> tuple[list[MidiTrack], float]:
+    """按风格组装多轨编排，返回 (tracks, bpm)。melody 默认关闭（你的地盘）。"""
+    if style not in STYLES:
+        raise ValueError(f"未知风格 {style!r}，可选：{', '.join(STYLES)}")
+    cfg = STYLES[style]
+    prog = cfg["progression"]
+    drum_fn, drum_kw = cfg["drums"]
+    bass_fn, bass_kw = cfg["bass"]
+
+    tracks = [
+        drum_fn(bars=bars, **drum_kw),
+        chords_track(prog, octave=cfg["chord_octave"], bars=bars),
+        bass_fn(prog, bars=bars, **bass_kw),
+    ]
+    if with_melody:
+        tracks.append(melody_track(prog, bars=bars, seed=seed))
+    return tracks, float(cfg["bpm"])
