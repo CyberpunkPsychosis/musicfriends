@@ -26,6 +26,9 @@ class MusicSpec:
     instrumental: bool = True                # EDM 默认纯器乐
     seed: Optional[int] = None
     output_dir: str = "output"
+    # --- 段落重生成（inpainting / 旋律条件）---
+    source_audio: Optional[str] = None       # 原曲音频；做 inpainting / audio-to-audio 的底
+    region: Optional[tuple[float, float]] = None  # 只重生成的区间(秒)，如 (16.0, 24.0) = drop
 
 
 @dataclass
@@ -49,10 +52,23 @@ class MusicProvider(abc.ABC):
     required_env: tuple[str, ...] = ()
     #: 一句话能力描述，--list 时显示
     blurb: str = ""
+    #: 能力声明
+    supports_melody: bool = False   # 旋律条件（吃你的旋律去编曲）
+    supports_inpaint: bool = False  # 段落重绘（只重生成某区间）
 
     @abc.abstractmethod
     def generate(self, spec: MusicSpec) -> GenerationResult:
         ...
+
+    def regenerate_section(self, spec: MusicSpec) -> GenerationResult:
+        """只重生成 spec.region 指定的一段（需 source_audio）。
+
+        默认走 generate（多数模型把"区间+底+旋律"塞进同一接口）；
+        不支持 inpaint 的 provider 会在 generate 里忽略 region，靠拼接器兜底。
+        """
+        if not spec.region:
+            raise ValueError("regenerate_section 需要 spec.region=(start_s, end_s)")
+        return self.generate(spec)
 
     # --- 下面是通用逻辑，子类一般不用改 ---
 

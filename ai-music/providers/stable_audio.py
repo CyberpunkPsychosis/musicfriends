@@ -21,6 +21,7 @@ class StableAudioProvider(MusicProvider):
     name = "stable_audio"
     required_env = ("STABILITY_API_KEY",)
     blurb = "Stable Audio：官方 API，器乐 EDM + audio-to-audio + 局部重绘"
+    supports_inpaint = True  # audio-to-audio / inpainting：只重绘某区间
 
     def generate(self, spec: MusicSpec) -> GenerationResult:
         self.ensure_configured()

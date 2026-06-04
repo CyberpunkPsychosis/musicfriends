@@ -3,3 +3,4 @@ replicate          # Replicate（MusicGen）
 requests           # Stable Audio / Suno
 elevenlabs         # ElevenLabs Music
 python-dotenv      # 可选：自动加载 .env（没装也有手动解析兜底）
+numpy              # splice.py 音频拼接（段落重生成时用）

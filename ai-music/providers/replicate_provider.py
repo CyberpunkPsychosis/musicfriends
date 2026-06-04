@@ -23,6 +23,7 @@ class ReplicateProvider(MusicProvider):
     name = "replicate"
     required_env = ("REPLICATE_API_TOKEN",)
     blurb = "MusicGen：支持旋律条件/和弦条件/分轨，最契合本工作流"
+    supports_melody = True   # MusicGen-melody：吃你的旋律去编曲
 
     def generate(self, spec: MusicSpec) -> GenerationResult:
         self.ensure_configured()

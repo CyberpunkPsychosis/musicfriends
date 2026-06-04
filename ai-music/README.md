@@ -31,6 +31,19 @@ python generate.py --provider replicate --prompt "..." --melody my_lead.wav
 > **路由原则**：出"声音"优先调专业模型（`--auto` 按 `PRIORITY` 选已配置的，
 > MusicGen 居首）；要**可编辑 MIDI** 仍走符号路（`../ardour-ai/`，无需 key）。
 
+## 段落重生成（音频路的模块化）
+
+对应你的迭代循环："改好 drop 的旋律 → 让大模型用我的旋律只重生成这一段 → 拼回原曲"。
+
+- **能力声明**：`provider.supports_melody`（旋律条件）/ `supports_inpaint`（段落重绘），
+  `--list` 会显示。MusicGen=🎹旋律条件；Stable Audio / ElevenLabs=✂️段落重绘。
+- **`MusicSpec.region=(start_s, end_s)` + `melody_path` + `source_audio`**：描述"只重生成
+  哪一段、以哪段旋律为条件、在哪条原曲上"。`provider.regenerate_section(spec)` 调用。
+- **`splice.py`**：把"新生成的一段"等功率交叉淡化**拼回原曲**，区间外**逐样本不变**
+  （已单测保证）。`replace_region_in_file(原曲, 新段, start_s, end_s, 输出)`。
+
+> 模型调用需 key（口子就绪）；拼接器 `splice.py` 不需要 key、已测通，是"只换这一段"的保证。
+
 ## 各家现状（2026 年中）
 
 | provider | 官方 API | 亮点 | env |

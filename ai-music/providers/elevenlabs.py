@@ -16,6 +16,7 @@ class ElevenLabsProvider(MusicProvider):
     name = "elevenlabs"
     required_env = ("ELEVENLABS_API_KEY",)
     blurb = "Eleven Music：录音室级，API 支持段落重绘（需账号开通 Music API）"
+    supports_inpaint = True  # API 层 inpainting：段落重绘
 
     def generate(self, spec: MusicSpec) -> GenerationResult:
         self.ensure_configured()

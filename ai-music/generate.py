@@ -25,8 +25,14 @@ def cmd_list() -> None:
     for p in all_providers():
         flag = "✅" if p.is_configured() else "⛔"
         need = ", ".join(p.required_env)
+        caps = []
+        if p.supports_melody:
+            caps.append("🎹旋律条件")
+        if p.supports_inpaint:
+            caps.append("✂️段落重绘")
+        cap_str = ("  能力: " + " ".join(caps)) if caps else ""
         print(f"  {flag}  {p.name:<13} {p.blurb}")
-        print(f"       需要: {need}\n")
+        print(f"       需要: {need}{cap_str}\n")
     print("填 key：编辑 ai-music/.env（参考 .env.example）")
 
 
