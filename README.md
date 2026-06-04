@@ -13,6 +13,7 @@ git checkout <旧commit> -- .   # 取回旧版本的文件
 
 - [AI 协作音乐制作工作流](docs/workflow.md) —— 角色分工、模块化原则、AI↔FL 交接方式、工具链
 - [音乐生成大模型 API 对比](docs/music-api-comparison.md) —— 各家 API 现状、选型建议、来源
+- [以 Ardour 为底座的 AI 驱动编曲软件（设计）](docs/ardour-ai-daw-design.md) —— MCP 桥接架构、分阶段路线、技术风险
 
 ## 代码
 
