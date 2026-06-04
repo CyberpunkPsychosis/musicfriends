@@ -128,5 +128,24 @@ def save_arrangement(bpm: float, tracks: list[dict], out_dir: str,
     return "✅ 已落地：" + ", ".join(p.name for p in paths) + f"（{out_dir}/）"
 
 
+@mcp.tool()
+def regenerate_section(target: str, new_seed: int, out_dir: str,
+                       style: str = "melodic") -> str:
+    """段落级模块化：只重做某一段（intro/buildup/drop/break/drop2），其它段不动。
+
+    产出整首 full.mid + 仅该段的 <target>.mid（可拖进 DAW 替换那一段）。
+    用默认歌曲结构；体现"只让 AI 改某个部分"的灵活性。
+    """
+    from ardour_ai import song
+    from ardour_ai.midi import write_smf
+    from pathlib import Path
+    full, bpm, section_only, _ = song.regenerate_section(
+        song.DEFAULT_STRUCTURE, target=target, new_seed=new_seed, style=style)
+    out = Path(out_dir); out.mkdir(parents=True, exist_ok=True)
+    write_smf(out / "full.mid", full, bpm=bpm)
+    write_smf(out / f"{target}.mid", section_only, bpm=bpm)
+    return f"✅ 只重做了「{target}」段（其它段不变）→ {out_dir}/full.mid + {target}.mid"
+
+
 if __name__ == "__main__":
     mcp.run()

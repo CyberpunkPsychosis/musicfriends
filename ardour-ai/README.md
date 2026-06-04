@@ -77,6 +77,9 @@ python make_demo.py --style future_bass --melody --seed 7 --render
 - `ardour_ai/render.py` —— MIDI → WAV 试听合成，让「生成 → 听 → 迭代」闭环。
   `python -m ardour_ai.render any.mid` 可渲染任意 .mid。注：试听音质，成品音色仍在
   FL/Ardour 用你的音色做。
+- `ardour_ai/song.py` —— **段落级模块化**：整首 = intro/buildup/drop/break/… 一串段落；
+  `regenerate_section()` **只重做某一段，其它段逐字节不变**，并单独导出那段以便替换。
+  `make_song.py --regen buildup --seed 999` / MCP 工具 `regenerate_section`。
 - `ardour_ai/arrangement.py` —— 把**音符 JSON 落地**成 MIDI/试听（无需 key）。
   对话中的 Claude（我）直接产出音符 → 这里变成 .mid / .wav / 进 Ardour。
   **不需要 Anthropic API**：驱动 MCP 的就是 Claude，不必让 server 反过来调 Claude。
