@@ -44,6 +44,22 @@ python generate.py --provider replicate --prompt "..." --melody my_lead.wav
 
 > 模型调用需 key（口子就绪）；拼接器 `splice.py` 不需要 key、已测通，是"只换这一段"的保证。
 
+### 一条龙命令（迭代循环第⑤步）
+
+调模型 → 拼回原曲 → 出新曲，一句话：
+
+```bash
+# 按段名（用默认 EDM 布局换算秒，需 --bpm）
+python regenerate.py --full song.wav --section drop --bpm 150 \
+    --prompt "euphoric melodic dubstep drop" --melody my_drop_lead.wav
+
+# 或直接给秒区间（适用任意音频）
+python regenerate.py --full song.wav --start 12.8 --end 25.6 --prompt "..."
+```
+
+`--provider auto` 自动选已配置 key 的专业模型。对应 MCP 工具 `regenerate_audio_section`
+（在 `../ardour-ai/` server 里），可在对话中直接调。
+
 ## 各家现状（2026 年中）
 
 | provider | 官方 API | 亮点 | env |

@@ -147,5 +147,46 @@ def regenerate_section(target: str, new_seed: int, out_dir: str,
     return f"✅ 只重做了「{target}」段（其它段不变）→ {out_dir}/full.mid + {target}.mid"
 
 
+@mcp.tool()
+def regenerate_audio_section(full_audio: str, prompt: str, out_path: str,
+                             section: str = "", bpm: float = 0.0,
+                             start_s: float = -1.0, end_s: float = -1.0,
+                             melody: str = "", provider: str = "auto") -> str:
+    """音频路段落重生成（迭代循环第⑤步）：大模型只重生成一段 → 拼回原曲。
+
+    区间二选一：section+bpm（intro/buildup/drop/break/drop2）或 start_s+end_s。
+    melody=你的旋律（旋律条件，你主导旋律）。provider=auto 自动选已配置 key 的专业模型。
+    模型调用需 key；拼接（只换这一段）不需要 key。区间外逐样本不变。
+    """
+    import sys
+    from pathlib import Path
+    sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "ai-music"))
+    try:
+        from regenerate import (section_to_seconds, regenerate_and_splice,
+                                _resolve_provider)
+        from providers import MissingAPIKey
+    except ImportError as e:
+        return f"⛔ 无法加载 ai-music（{e}）。确认仓库结构完整。"
+
+    if section:
+        if not bpm:
+            return "⛔ 用 section 时需要 bpm"
+        a, b = section_to_seconds(section, bpm)
+    elif start_s >= 0 and end_s >= 0:
+        a, b = start_s, end_s
+    else:
+        return "⛔ 需 section+bpm 或 start_s+end_s"
+
+    try:
+        p = _resolve_provider(provider)
+        out = regenerate_and_splice(p, full_audio, a, b, prompt,
+                                    melody_path=melody or None, out_path=out_path)
+    except MissingAPIKey as e:
+        return f"⛔ {e}"
+    except SystemExit as e:
+        return f"⛔ {e}"
+    return f"✅ 只重生成 [{a:.1f}s,{b:.1f}s] 并拼回 → {out}"
+
+
 if __name__ == "__main__":
     mcp.run()
