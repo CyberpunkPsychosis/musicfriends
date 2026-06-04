@@ -112,6 +112,15 @@ OSC 默认不能跑任意 Lua。候选机制（阶段 1 做技术验证 spike）
   先做 §6 的 spike 定下 Lua 触发机制；再实现 `add_midi_track` / `write_region` / `set_tempo`。
 - **阶段 2 · 接大模型口子**
   `ai-music/` 出 MIDI → 直接 `write_region` 进 Ardour；出音频/stems → `import_audio`。
+
+> **MIDI 基础层（已完成，云端可验证）**：`ardour-ai/ardour_ai/midi.py`（无依赖 SMF 写入）
+> + `compose.py`（EDM 鼓/和弦/bass 助手）。产出标准 `.mid`，FL/Ardour 都能拖入，
+> 已用 mido 回读测通。这层是下面「离线 `.ardour` 生成器」的素材基础。
+>
+> **关于离线 `.ardour` 生成器（修正预期）**：`.ardour` 是复杂且版本强绑定的 XML，
+> 云端只能验证「XML 合法」，无法验证「Ardour 能打开」。**正确做法是模板法**——
+> 由你在本地保存一个最简 Ardour 工程，把 `.ardour` 作为模板，我们用脚本往里
+> 塞轨道并引用上面生成的 SMF 文件。该步待你能本地 open-test 时再做，避免硬猜 schema。
 - **阶段 3 · 远程协作/网页**
   接 Ardour 新出的 web 控制面 + 远程协作，对接你"网页媒介"的想法。
 

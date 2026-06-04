@@ -59,6 +59,22 @@ python server.py               # 启动 MCP server (stdio)
 配好后，你在本地 Claude 里说「新建一条叫 Lead 的 MIDI 轨，速度设 140」，
 就会经 MCP → 本 server → Ardour 执行。
 
+## 作曲 → MIDI（云端已完成，今天就能用）
+
+不依赖 Ardour 也不依赖任何 key：把高层描述变成真实 `.mid`，FL / Ardour 都能拖入。
+
+```bash
+python make_demo.py --bpm 140 --bars 8 --out demo_midi
+# 产出 drums/chords/bass/buildup（按轨分文件，模块化）+ full（合并）
+```
+
+- `ardour_ai/midi.py` —— 无依赖 SMF 写入器（Note → .mid），用 mido 回读验证
+- `ardour_ai/compose.py` —— EDM 助手：和弦走向、four-on-floor 鼓、bass、buildup
+  （命中你的节奏/和声痛点；**旋律默认不生成，留给你**）
+
+> 同一个 `Note` 模型既能 `write_smf` 成文件，也能经 `write_notes` MCP 工具进 Ardour。
+> 这层是未来离线 `.ardour` 工程生成器要引用的素材基础。
+
 ## 阶段 1 待办（本地）
 
 - [ ] 验证 OSC：开 Ardour OSC 后，工具能控制走带/推子
