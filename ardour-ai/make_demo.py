@@ -19,6 +19,8 @@ def main() -> int:
     ap.add_argument("--bpm", type=float, default=140)
     ap.add_argument("--bars", type=int, default=8)
     ap.add_argument("--out", default="demo_midi")
+    ap.add_argument("--render", action="store_true",
+                    help="同时渲染 full.wav 试听（需 numpy）")
     args = ap.parse_args()
 
     out = Path(args.out)
@@ -48,6 +50,11 @@ def main() -> int:
     print(f"已生成 {len(written)} 个 MIDI 到 {out}/ （{args.bpm} BPM, {args.bars} 小节）:")
     for p in written:
         print("  •", p.name)
+
+    if args.render:
+        from ardour_ai.render import render_tracks, write_wav
+        wav = write_wav(out / "full.wav", render_tracks(combined, bpm=args.bpm))
+        print(f"试听已渲染 -> {wav.name}")
     return 0
 
 

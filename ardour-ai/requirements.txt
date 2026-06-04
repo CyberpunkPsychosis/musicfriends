@@ -1,3 +1,7 @@
 mcp[cli]      # MCP server SDK (FastMCP)
 python-osc    # Ardour OSC 控制
 pytest        # 测试（开发用）
+
+# 试听渲染（可选；不渲染就不用装）
+numpy         # MIDI → WAV 合成
+mido          # 渲染任意 .mid 文件 / 测试回读
