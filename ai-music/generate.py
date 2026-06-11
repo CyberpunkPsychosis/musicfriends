@@ -5,11 +5,11 @@ key 还没配也能用：
     python generate.py --list          # 看哪些 provider 就绪、哪些缺 key
 
 配好任意一家 key 后：
-    python generate.py --provider replicate \\
+    python generate.py --provider ace_step \\
         --prompt "140 BPM melodic dubstep, dark intro to euphoric drop" \\
         --bpm 140 --duration 30 --out output
-    # 以你自己的旋律为基础（旋律你主导）：
-    python generate.py --provider replicate --prompt "..." --melody my_lead.wav
+    # 以你自己的旋律/哼唱为基础（旋律你主导；wav 直接喂，或先 hum2midi.py 转 MIDI 精修）：
+    python generate.py --provider ace_step --prompt "..." --melody my_hum.wav
 """
 from __future__ import annotations
 
@@ -41,7 +41,7 @@ def main() -> int:
     ap.add_argument("--list", action="store_true", help="列出 provider 及就绪状态")
     ap.add_argument("--auto", action="store_true",
                     help="自动选优先级最高且已配置 key 的专业模型（出声音优先专业模型）")
-    ap.add_argument("--provider", help="replicate / stable_audio / elevenlabs / suno")
+    ap.add_argument("--provider", help="ace_step / elevenlabs / stable_audio / replicate / suno")
     ap.add_argument("--prompt", help="文本描述")
     ap.add_argument("--duration", type=int, default=30, help="时长(秒)")
     ap.add_argument("--bpm", type=int)

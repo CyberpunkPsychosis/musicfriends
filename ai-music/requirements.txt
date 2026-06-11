@@ -1,6 +1,13 @@
 # 按需安装，用哪家装哪家
-replicate          # Replicate（MusicGen）
-requests           # Stable Audio / Suno
+requests           # ACE-Step / Stable Audio / Suno
 elevenlabs         # ElevenLabs Music
+replicate          # Replicate（MusicGen，实验项）
 python-dotenv      # 可选：自动加载 .env（没装也有手动解析兜底）
 numpy              # splice.py 音频拼接（段落重生成时用）
+
+# --- 灵感输入管道（hum2midi.py，在你本机装）---
+# basic-pitch       # 哼唱→MIDI（Spotify 开源）
+# librosa           # BPM / 调性检测
+
+# --- stems 分离（stems.py，在你本机装）---
+# audio-separator[cpu]   # 或 [gpu]；RoFormer 系 SOTA 权重

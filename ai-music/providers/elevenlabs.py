@@ -1,8 +1,10 @@
-"""ElevenLabs Music 适配器 —— 录音室级，API 层支持段落重绘(inpainting)。
+"""ElevenLabs Music 适配器 —— 2026-06 复检后「转正」：商业选项中的第一顺位。
 
-注意：v2 自助 API 于 2026 年逐步开放，企业先行。接 key 前先确认你的账号已开通 Music API。
+转正依据（docs/research-2026-06.md）：官方 API 已可用，且是目前唯一同时具备
+官方 API + 段落级编辑 + stems 分离端点（two_stems/six_stems，返回 ZIP）的商业服务。
 docs: https://elevenlabs.io/docs/overview/capabilities/music
-TODO(接 key 后核对): 官方 python SDK(elevenlabs) 的 music 接口签名以当时文档为准。
+      https://elevenlabs.io/docs/api-reference/music/separate-stems
+TODO(接 key 后核对): SDK 的 music 接口签名与 stems 端点参数以当时文档为准。
 """
 from __future__ import annotations
 
@@ -15,7 +17,7 @@ from .config import get_key
 class ElevenLabsProvider(MusicProvider):
     name = "elevenlabs"
     required_env = ("ELEVENLABS_API_KEY",)
-    blurb = "Eleven Music：录音室级，API 支持段落重绘（需账号开通 Music API）"
+    blurb = "Eleven Music：官方 API + 段落编辑 + stems 端点，商业选项第一顺位"
     supports_inpaint = True  # API 层 inpainting：段落重绘
 
     def generate(self, spec: MusicSpec) -> GenerationResult:

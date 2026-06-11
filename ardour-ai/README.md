@@ -1,5 +1,11 @@
 # ardour-ai — AI 驱动 Ardour 的 MCP server
 
+> ⚠️ **2026-06 复检后，Lua 编曲桥（write_notes/import_audio）已冻结**：
+> Ardour 9.5 官方 MCP 落地但只做无障碍控制；Ableton/REAPER 的社区 MCP 已能写音符，
+> 「对话驱动 DAW」改走现成生态 —— 见 [`../docs/daw-mcp-setup.md`](../docs/daw-mcp-setup.md)。
+> **继续可用的部分**：OSC 走带/混音工具、以及与 DAW 无关的整个符号层
+> （compose/song/midi/render/arrangement，见下文"作曲 → MIDI"）。
+
 设计文档见 [`../docs/ardour-ai-daw-design.md`](../docs/ardour-ai-daw-design.md)。
 本目录是**阶段 1** 的代码：在你 Mac 上跑的 MCP server，让你在对话里驱动 Ardour。
 
@@ -95,6 +101,6 @@ python make_demo.py --style future_bass --melody --seed 7 --render
 ## 阶段 1 待办（本地）
 
 - [ ] 验证 OSC：开 Ardour OSC 后，工具能控制走带/推子
-- [ ] 验证 Lua 桥：手动触发 `ai_bridge.lua`，跑通 `add_midi_track` / `set_tempo`
-- [ ] 落实 `write_notes`（region + MidiModel）与 `import_audio`（SourceFactory）
-- [ ] 定周期轮询方案，让 Lua 桥常驻自动执行
+- ~~验证 Lua 桥 / 落实 write_notes、import_audio / 周期轮询~~ —— **已冻结**
+  （2026-06 决策，见 [`../docs/daw-mcp-setup.md`](../docs/daw-mcp-setup.md)；
+  代码保留，待 Ardour 官方 MCP 接口加深后再评估）

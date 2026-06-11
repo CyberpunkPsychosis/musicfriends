@@ -85,7 +85,7 @@ def main() -> int:
     ap.add_argument("--start", type=float, help="区间起(秒)，与 --section 二选一")
     ap.add_argument("--end", type=float, help="区间止(秒)")
     ap.add_argument("--melody", help="你的旋律(用于旋律条件，你主导旋律)")
-    ap.add_argument("--provider", default="auto", help="auto / replicate / stable_audio / ...")
+    ap.add_argument("--provider", default="auto", help="auto / ace_step / elevenlabs / ...")
     ap.add_argument("--out", help="输出新曲路径")
     ap.add_argument("--crossfade", type=float, default=30.0, help="交叉淡化(毫秒)")
     args = ap.parse_args()
