@@ -11,8 +11,10 @@ git checkout <旧commit> -- .   # 取回旧版本的文件
 
 ## 文档
 
+- **[2026-06 复检调研](docs/research-2026-06.md)** —— 最新格局（Suno v5.5 / ACE-Step 1.5 / Ardour 官方 MCP 等）、
+  三条推荐路线、仓库改造清单。**选型以此为准**。
 - [AI 协作音乐制作工作流](docs/workflow.md) —— 角色分工、模块化原则、AI↔FL 交接方式、工具链
-- [音乐生成大模型 API 对比](docs/music-api-comparison.md) —— 各家 API 现状、选型建议、来源
+- [音乐生成大模型 API 对比](docs/music-api-comparison.md) —— ⚠️ 2026-06 复检后部分结论已过时（MusicGen 首选、Udio 候选已作废），见上面的复检调研
 - [以 Ardour 为底座的 AI 驱动编曲软件（设计）](docs/ardour-ai-daw-design.md) —— MCP 桥接架构、分阶段路线、技术风险
 
 ## 代码
